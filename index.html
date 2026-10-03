@@ -601,13 +601,14 @@ canvas#c{display:block;width:100%;height:100%}
   const saveProg = () => { try { localStorage.setItem('skoczek5', JSON.stringify(prog)); localStorage.setItem('skoczek-look', JSON.stringify(look)); } catch (e) {} };
   const totalStars = () => Object.values(prog).reduce((a, p) => a + (p.stars || 0), 0);
   const hexCss = c => '#' + c.toString(16).padStart(6, '0');
-  let devMode = false; try { localStorage.removeItem('skoczek-dev'); } catch (e) {}
+  let devMax = 0; try { localStorage.removeItem('skoczek-dev'); } catch (e) {}
   function tryCode() {
     const v = $('codeIn').value.trim(), msg = $('codeMsg');
     if (!v) { msg.style.color = '#d6336c'; msg.textContent = 'Wpisz kod'; return; }
-    if (v === '2137') { devMode = true; msg.style.color = '#1f9e5a'; msg.textContent = 'Tryb testowy włączony, wszystkie światy odblokowane'; SFX.cp(); }
+    if (v === '2137') { devMax = LEVELS.length; msg.style.color = '#1f9e5a'; msg.textContent = 'Odblokowano wszystkie światy (1–' + LEVELS.length + ')'; SFX.cp(); }
+    else if (v === '5421') { devMax = 6; msg.style.color = '#1f9e5a'; msg.textContent = 'Odblokowano światy 1–6'; SFX.cp(); }
     else {
-      devMode = false; prog = {}; look = { color: 0x4f9dff, hat: 'none' };
+      devMax = 0; prog = {}; look = { color: 0x4f9dff, hat: 'none' };
       try { localStorage.removeItem('skoczek5'); localStorage.removeItem('skoczek-look'); localStorage.removeItem('skoczek-dev'); } catch (e) {}
       applyLook(); msg.style.color = '#d6336c'; msg.textContent = 'Zły kod. Cały postęp skasowany'; SFX.die();
     }
@@ -627,10 +628,10 @@ canvas#c{display:block;width:100%;height:100%}
   }
   function renderMenu() {
     const box = $('levels'); box.innerHTML = '';
-    $('total').innerHTML = `Masz <b>${totalStars()} / ${LEVELS.length * 3}</b> gwiazdek` + (devMode ? ' · <b style="color:#d6336c">tryb testowy</b>' : '');
-    $('skipBtn').style.display = devMode ? '' : 'none';
+    $('total').innerHTML = `Masz <b>${totalStars()} / ${LEVELS.length * 3}</b> gwiazdek` + (devMax ? ' · <b style="color:#d6336c">tryb testowy: światy 1–' + devMax + '</b>' : '');
+    $('skipBtn').style.display = devMax ? '' : 'none';
     LEVELS.forEach((lv, i) => {
-      const p = prog[i] || {}, unlocked = devMode || i === 0 || (prog[i - 1] && prog[i - 1].stars > 0);
+      const p = prog[i] || {}, unlocked = i < devMax || i === 0 || (prog[i - 1] && prog[i - 1].stars > 0);
       const b = document.createElement('button'); b.className = 'lv' + (unlocked ? '' : ' locked');
       const st = [0, 1, 2].map(k => `<span class="${(p.stars || 0) > k ? 'on' : ''}">★</span>`).join('');
       b.innerHTML = `<div class="sq" style="background:${hexCss(lv.card)}">${unlocked ? i + 1 : '🔒'}</div><div class="tx"><b>${lv.name}</b><small>${unlocked ? lv.sub + (p.time ? ' · ' + fmt(p.time) : '') : 'Przejdź poprzedni świat'}</small></div><div class="st">${st}</div>`;
@@ -906,7 +907,7 @@ canvas#c{display:block;width:100%;height:100%}
   $('nextBtn').onclick = () => { if (levelIdx < LEVELS.length - 1) startLevel(levelIdx + 1); };
   $('codeBtn').onclick = tryCode; $('codeIn').addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') tryCode(); });
   $('codeIn').addEventListener('keyup', e => e.stopPropagation());
-  $('skipBtn').onclick = () => startLevel((levelIdx + 1) % LEVELS.length);
+  $('skipBtn').onclick = () => startLevel(devMax ? (levelIdx + 1) % devMax : levelIdx);
   document.addEventListener('visibilitychange', () => { if (document.hidden && state === 'play' && !paused) togglePause(); });
 
   applyLook(); loadLevel(0); respawn(); renderMenu();
