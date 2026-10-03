@@ -604,7 +604,7 @@ canvas#c{display:block;width:100%;height:100%}
   let devMode = false; try { devMode = localStorage.getItem('skoczek-dev') === '1'; } catch (e) {}
   function tryCode() {
     const v = $('codeIn').value.trim(), msg = $('codeMsg');
-    if (v === '5421') { devMode = !devMode; try { localStorage.setItem('skoczek-dev', devMode ? '1' : '0'); } catch (e) {} msg.style.color = '#1f9e5a'; msg.textContent = devMode ? 'Tryb testowy włączony, wszystkie światy odblokowane' : 'Tryb testowy wyłączony'; SFX.cp(); renderMenu(); }
+    if (v === '2137') { devMode = !devMode; try { localStorage.setItem('skoczek-dev', devMode ? '1' : '0'); } catch (e) {} msg.style.color = '#1f9e5a'; msg.textContent = devMode ? 'Tryb testowy włączony, wszystkie światy odblokowane' : 'Tryb testowy wyłączony'; SFX.cp(); renderMenu(); }
     else { msg.style.color = '#d6336c'; msg.textContent = 'Zły kod'; SFX.die(); }
     $('codeIn').value = '';
   }
