@@ -604,10 +604,16 @@ canvas#c{display:block;width:100%;height:100%}
   let devMode = false; try { localStorage.removeItem('skoczek-dev'); } catch (e) {}
   function tryCode() {
     const v = $('codeIn').value.trim(), msg = $('codeMsg');
+    if (!v) { msg.style.color = '#d6336c'; msg.textContent = 'Wpisz kod'; return; }
     if (v === '2137') { devMode = true; msg.style.color = '#1f9e5a'; msg.textContent = 'Tryb testowy włączony, wszystkie światy odblokowane'; SFX.cp(); }
-    else { const was = devMode; devMode = false; msg.style.color = '#d6336c'; msg.textContent = was ? 'Zły kod. Tryb testowy wyłączony' : 'Zły kod'; SFX.die(); }
+    else {
+      devMode = false; prog = {}; look = { color: 0x4f9dff, hat: 'none' };
+      try { localStorage.removeItem('skoczek5'); localStorage.removeItem('skoczek-look'); localStorage.removeItem('skoczek-dev'); } catch (e) {}
+      applyLook(); msg.style.color = '#d6336c'; msg.textContent = 'Zły kod. Cały postęp skasowany'; SFX.die();
+    }
     $('codeIn').value = ''; renderMenu();
   }
+
 
   const HATS = [{ id: 'none', name: 'Nic', need: 0 }, { id: 'cap', name: 'Czapka', need: 0 }, { id: 'ears', name: 'Uszy', need: 5 }, { id: 'crown', name: 'Korona', need: 12 }, { id: 'halo', name: 'Aureola', need: 24 }];
   const COLORS = [0x4f9dff, 0xff4f8b, 0x3ddc84, 0xff9a3c, 0x9b6bff, 0x16213a, 0xffffff];
